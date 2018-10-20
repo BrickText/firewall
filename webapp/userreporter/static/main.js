@@ -1,5 +1,6 @@
 var map;
 var fireCircles = new Array();
+var activeMarkers = new Array();
 var marker;
 
 function setMapOnLocation(location) {
@@ -14,19 +15,13 @@ function setMapOnLocation(location) {
         url: '/get_fire',
         async: false,
         success: function(data) {
-            console.log(data);
             data = JSON.parse(data)["data"];
-            console.log(data);
-            console.log(map)
             data.forEach(el => {
             createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
                          parseFloat(el[2]));
             });
         }
       });
-    fireCircles.forEach(circle => {
-        circle.addListener('click', function() {confirmFireModal(circle.center)});
-    })
     enableMarkers();
 }
 
@@ -71,6 +66,7 @@ function createCircle(map, center, radius) {
         center: center,
         radius: radius
     });
+    circle.addListener('click', function() {confirmFireModal(circle.center)});
     fireCircles.push(circle);
 }
 
@@ -115,9 +111,15 @@ function reportFire() {
         'lng': position.longitude
     } 
     
-    postData("/fire_confirm", data, function() {})
+    postData("/predict_fire", data, function(data) {
+        positions = JSON.parse(data)["data"];
+        createCircle(map, {lat: parseFloat(positions[0]), lng: parseFloat(positions[1])},
+            parseFloat(positions[2]));
+    })
 
     $("#reportFire").modal('hide');
+    marker.setMap(null); // remove temp marker
+    addActiveFireAnimation(position)
 }
 
 function confirmFire(confermed) {
@@ -130,6 +132,9 @@ function confirmFire(confermed) {
 
     if(!confermed) {
         removeCircle(position);
+        removeActiveMarker(position);
+    } else {
+        addActiveFireAnimation(position)
     }
 
     postData("/fire_confirm", data, function() {   })
@@ -139,6 +144,34 @@ function confirmFire(confermed) {
 function getLongLatOfClick() {
     var res =  $("#position").val().split(",");
     return {'latitude': res[0], 'longitude': res[1] }
+}
+
+function removeActiveMarker(position) {
+    activeMarkers.forEach(element => {
+        if(element.position.lat() == position.latitude && element.position.lng() == position.longitude) {
+            element.setMap(null);
+        }
+    })
+}
+
+function addActiveFireAnimation(position) {
+    
+    var infowindow = new google.maps.InfoWindow({
+        content: "<h3>Active fire reported by user!</h3>"
+      });
+    active_marker = new google.maps.Marker({
+        map: map,
+        draggable: true,
+        animation: google.maps.Animation.DROP,
+        position: {lat: parseFloat(position.latitude), lng: parseFloat(position.longitude)}
+    });
+
+    active_marker.setAnimation(google.maps.Animation.BOUNCE);
+    active_marker.addListener('click', function() {
+        infowindow.open(map, active_marker);
+    });
+
+    activeMarkers.push(active_marker);
 }
 
 function postData(url, data, callback_func) {

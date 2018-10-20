@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from userreporter.views import get_map, post_confirm, get_fires
+from userreporter.views import get_map, post_confirm, get_fires, post_predict_new_fire
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', get_map),
     path('fire_confirm', post_confirm),
-    path('get_fire', get_fires)
+    path('get_fire', get_fires),
+    path('predict_fire', post_predict_new_fire),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

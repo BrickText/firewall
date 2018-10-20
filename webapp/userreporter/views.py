@@ -28,6 +28,21 @@ def post_confirm(request):
         return HttpResponse(status=404)
 
 
+@csrf_exempt
+def post_predict_new_fire(request):
+    if request.method == "POST":
+        confermed = request.POST['confermed']
+        lat = request.POST['lat']
+        lng = request.POST['lng']
+        df = pd.DataFrame([get_features(lat, lng).to_pandas()])
+        with open('../models/svm.b', 'rb') as f:
+            svm = pickle.load(f)
+        area = svm.predict(df)
+        area = np.exp(area) * 10000
+        print(area)
+        return HttpResponse(json.dumps({'data': [lat, lng, area[0]]}))
+    return HttpResponse(status=404)
+
 def get_fires(request):
     with open('../models/fire_clustering.b', 'rb') as f:
         fire_clustering = pickle.load(f)
