@@ -9,8 +9,24 @@ function setMapOnLocation(location) {
         mapTypeId: 'satellite' 
     });
 
-    createCircle(map, {lat: location.latitude, lng: location.longitude }, 50);
-    createCircle(map, {lat: 42, lng: 23 }, 10000);
+    $.ajax({
+        type: "GET",
+        url: '/get_fire',
+        async: false,
+        success: function(data) {
+            console.log(data);
+            data = JSON.parse(data)["data"];
+            console.log(data);
+            console.log(map)
+            data.forEach(el => {
+            createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
+                         parseFloat(el[2]));
+            });
+        }
+      });
+    fireCircles.forEach(circle => {
+        circle.addListener('click', function() {confirmFireModal(circle.center)});
+    })
     enableMarkers();
 }
 
@@ -24,10 +40,6 @@ function initMap() {
       var longt = 0, lat = 0;
       function success(pos) {
         setMapOnLocation(pos.coords);
-        
-        fireCircles.forEach(circle => {
-            circle.addListener('click', function() {confirmFireModal(circle.center)});
-        })
       }
       
       function error(err) {
