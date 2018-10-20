@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from userreporter.models import Fire
 import requests 
 
 import pandas as pd
@@ -23,6 +24,7 @@ def post_confirm(request):
         lat = request.POST['lat']
         lng = request.POST['lng']
         get_features(lat, lng)
+        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=confermed)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=404)
@@ -31,7 +33,6 @@ def post_confirm(request):
 @csrf_exempt
 def post_predict_new_fire(request):
     if request.method == "POST":
-        confermed = request.POST['confermed']
         lat = request.POST['lat']
         lng = request.POST['lng']
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
@@ -39,9 +40,10 @@ def post_predict_new_fire(request):
             svm = pickle.load(f)
         area = svm.predict(df)
         area = np.exp(area) * 10000
-        print(area)
+        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=True)
         return HttpResponse(json.dumps({'data': [lat, lng, area[0]]}))
     return HttpResponse(status=404)
+
 
 def get_fires(request):
     with open('../models/fire_clustering.b', 'rb') as f:
@@ -56,9 +58,13 @@ def get_fires(request):
          for centroid in centroids])
     area = svm.predict(df)
     area = np.exp(area) * 10000
-    print(area)
-    print(centroids)
-    print(np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1))
+    
+    concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
+    dbObjects = []
+    
+    for entry in concatenatedData:
+        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False))
+    Fire.objects.bulk_create(dbObjects)
     return HttpResponse(json.dumps({'data': np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1).tolist()}))
 
 
@@ -86,10 +92,3 @@ class DataSetSample(dict):
         return ("Humidity: " + str(self.humidity) + " Temperature: " + str(self.temp) + " Wind speed: " +
             str(self.wind_speed) + " Rain per m^2:" + str(self.rain_per_mm))
 
-
-class Fire(dict):
-    def __init__(self, lat, lng, range):
-        super(dict, self).__init__()
-        self['lat'] = lat
-        self['lng'] = lng
-        self['range'] = range
