@@ -28,8 +28,8 @@ fires = pd.read_csv("./forestfires.csv")
 
 X = fires[FEATURE_NAMES]
 y_raw = fires["area"]
-y_log = np.log(fires["area"]+1)
-y_sin = np.sin(fires["area"])
+y_log = fires["log(area+1)"]
+y_sin = fires["sin(area)"]
 
 
 #############################
