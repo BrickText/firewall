@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from userreporter.views import MapView
+from userreporter.views import get_map, post_confirm
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', MapView.as_view())
+    path('', get_map),
+    path('fire_confirm', post_confirm)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
