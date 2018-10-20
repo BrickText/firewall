@@ -18,13 +18,13 @@ __all__ = [
 
 
 FEATURE_NAMES = [
-    "DC",
     "temp",
     "RH",
     "wind",
+    "rain",
 ]
 
-fires = pd.read_csv("./forestfires.csv")
+fires = pd.read_csv("../forestfires.csv")
 
 X = fires[FEATURE_NAMES]
 y_raw = fires["area"]

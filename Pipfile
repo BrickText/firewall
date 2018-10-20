@@ -13,6 +13,7 @@ jupyter = "*"
 scikit-learn = "*"
 xgboost = "*"
 pylint = "*"
+requests = "*"
 
 [dev-packages]
 
