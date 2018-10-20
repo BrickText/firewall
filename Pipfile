@@ -12,6 +12,7 @@ seaborn = "*"
 jupyter = "*"
 scikit-learn = "*"
 xgboost = "*"
+pylint = "*"
 
 [dev-packages]
 
