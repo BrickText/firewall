@@ -71,7 +71,10 @@ def get_fires(request):
 def get_features(lat, lng):
     url = "http://api.apixu.com/v1/current.json?key=ad23cdc4a1404d34984174745182010&q="\
         + str(lat) + "," + str(lng)
-    r = requests.get(url).json()['current']
+    req = requests.get(url).json()
+    if 'error' in req:
+        return DataSetSample(0, 0, 0, 0)
+    r = req['current']
     dataSample = DataSetSample(r['humidity'], r['temp_c'], r['wind_kph'], r['precip_mm'])
     return dataSample
 
