@@ -26,3 +26,27 @@ urlpatterns = [
     path('get_fire', get_fires),
     path('predict_fire', post_predict_new_fire),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+def populate_base_on_start():
+    with open('../models/fire_clustering.b', 'rb') as f:
+        fire_clustering = pickle.load(f)
+    centroids = fire_clustering.cluster_centers_
+    df = pd.DataFrame(
+        [get_features(centroid[0], centroid[1]).to_pandas()
+         for centroid in centroids])
+    with open('../models/svm.b', 'rb') as f:
+        svm = pickle.load(f)
+    print([get_features(centroid[0], centroid[1]).to_pandas()
+         for centroid in centroids])
+    area = svm.predict(df)
+    area = np.exp(area) * 10000
+    
+    concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
+    dbObjects = []
+    
+    for entry in concatenatedData:
+        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False))
+    Fire.objects.bulk_create(dbObjects)
+
+
+populate_base_on_start()

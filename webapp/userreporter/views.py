@@ -46,26 +46,8 @@ def post_predict_new_fire(request):
 
 
 def get_fires(request):
-    with open('../models/fire_clustering.b', 'rb') as f:
-        fire_clustering = pickle.load(f)
-    centroids = fire_clustering.cluster_centers_
-    df = pd.DataFrame(
-        [get_features(centroid[0], centroid[1]).to_pandas()
-         for centroid in centroids])
-    with open('../models/svm.b', 'rb') as f:
-        svm = pickle.load(f)
-    print([get_features(centroid[0], centroid[1]).to_pandas()
-         for centroid in centroids])
-    area = svm.predict(df)
-    area = np.exp(area) * 10000
-    
-    concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
-    dbObjects = []
-    
-    for entry in concatenatedData:
-        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False))
-    Fire.objects.bulk_create(dbObjects)
-    return HttpResponse(json.dumps({'data': np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1).tolist()}))
+    fires = Fire.objects.all()
+    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, fire.is_active] for fire in fires]}))
 
 
 def get_features(lat, lng):
