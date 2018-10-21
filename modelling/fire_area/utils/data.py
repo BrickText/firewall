@@ -5,9 +5,7 @@ from sklearn import metrics
 
 __all__ = [
     "FEATURE_NAMES",
-
     "fires",
-    "fires_classif",
 
     "custom_scorer",
 ]
@@ -21,7 +19,6 @@ FEATURE_NAMES = [
 ]
 
 fires = pd.read_csv("../fires.csv")
-fires_classif = pd.read_csv("../fires_classif.csv")
 
 #############################
 ## Root Mean Squared Error ##
