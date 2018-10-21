@@ -46,7 +46,7 @@ def post_predict_new_fire(request):
 
 
 def get_fires(request):
-    with open('../models/fire_clustering.b', 'rb') as f:
+    with open('../models/fire_clustering_100.b', 'rb') as f:
         fire_clustering = pickle.load(f)
     centroids = fire_clustering.cluster_centers_
     df = pd.DataFrame(
