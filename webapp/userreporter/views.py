@@ -2,16 +2,17 @@ from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from userreporter.models import Fire
-import requests 
 
+import requests 
 import pandas as pd
 import numpy as np
 import pickle
 import sklearn
 import json
-
 from pprint import pprint
+
+from userreporter.models import Fire
+from userreporter.dc_models import FIRE_CLUSTERING, FIRE_AREA, FIRE_PROBA
 
 
 def get_map(request):
@@ -36,28 +37,18 @@ def post_predict_new_fire(request):
         lat = request.POST['lat']
         lng = request.POST['lng']
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
-        with open('../models/svm.b', 'rb') as f:
-            svm = pickle.load(f)
-        area = svm.predict(df)
-        area = np.exp(area) * 10000
+        area = FIRE_AREA.predict_raw(df) * 10000
         Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=True)
         return HttpResponse(json.dumps({'data': [lat, lng, area[0]]}))
     return HttpResponse(status=404)
 
 
 def get_fires(request):
-    with open('../models/fire_clustering_100.b', 'rb') as f:
-        fire_clustering = pickle.load(f)
-    centroids = fire_clustering.cluster_centers_
+    centroids = FIRE_CLUSTERING.cluster_centers_
     df = pd.DataFrame(
         [get_features(centroid[0], centroid[1]).to_pandas()
          for centroid in centroids])
-    with open('../models/svm.b', 'rb') as f:
-        svm = pickle.load(f)
-    print([get_features(centroid[0], centroid[1]).to_pandas()
-         for centroid in centroids])
-    area = svm.predict(df)
-    area = np.exp(area) * 10000
+    area = FIRE_AREA.predict_raw(df) * 10000
     
     concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
     dbObjects = []
