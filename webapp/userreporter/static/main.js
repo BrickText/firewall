@@ -9,7 +9,7 @@ function setMapOnLocation(location) {
         zoom: 7,
         mapTypeId: 'satellite' 
     });
-
+    console.log("Set map on location")
     $.ajax({
         type: "GET",
         url: '/get_fire',
@@ -17,8 +17,10 @@ function setMapOnLocation(location) {
         success: function(data) {
             data = JSON.parse(data)["data"];
             data.forEach(el => {
-            createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
-                         parseFloat(el[2]), parseFloat(el[3]), parseFloat(el[4]));
+                if(parseFloat(el[4]) >= 0.3) {
+                    createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
+                         parseFloat(el[2]), el[3], parseFloat(el[4]));
+                }
             });
         }
       });
@@ -67,8 +69,9 @@ function createCircle(map, center, radius, active, probability) {
         center: center,
         radius: radius
     });
-    if(active) {
-        addActiveFireAnimation(center)
+    console.log(active == "True")
+    if(active == "True") {
+        addActiveFireAnimation({latitude: center.lat, longitude: center.lng})
     }
     circle.addListener('click', function() {confirmFireModal(circle.center, probability, radius)});
     fireCircles.push(circle);
@@ -117,13 +120,13 @@ function reportFire() {
     
     postData("/predict_fire", data, function(data) {
         positions = JSON.parse(data)["data"];
+        console.log(positions)
         createCircle(map, {lat: parseFloat(positions[0]), lng: parseFloat(positions[1]),},
-            parseFloat(positions[2]), parseFloat(positions[3]));
+            parseFloat(positions[2]), "True",parseFloat(positions[3]));
     })
 
     $("#reportFire").modal('hide');
     marker.setMap(null); // remove temp marker
-    addActiveFireAnimation(position)
 }
 
 function confirmFire(confermed) {
@@ -159,7 +162,7 @@ function removeActiveMarker(position) {
 }
 
 function addActiveFireAnimation(position) {
-    
+    console.log(position)
     var infowindow = new google.maps.InfoWindow({
         content: "<h3>Active fire reported by user!</h3>"
       });

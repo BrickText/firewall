@@ -23,11 +23,12 @@ def get_map(request):
 def post_confirm(request):
     if request.method == "POST":
         confermed = True if request.POST['confermed'] == 'true' else False
-        lat = request.POST['lat']
-        lng = request.POST['lng']
-        get_features(lat, lng)
-        print(Fire.objects.all())
-        Fire.objects.filter(lat=float(lat), lng=float(lng)).update(is_active=confermed)
+        lat = round(float(request.POST['lat']), 5)
+        lng = round(float(request.POST['lng']), 5)
+        print([(fire.lat, fire.lng)for fire in Fire.objects.all()])
+        print(lat, lng)
+        print(Fire.objects.filter(lat=lat, lng=lng))
+        Fire.objects.filter(lat=lat, lng=lng).update(is_active=confermed)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=404)
@@ -36,19 +37,20 @@ def post_confirm(request):
 @csrf_exempt
 def post_predict_new_fire(request):
     if request.method == "POST":
-        lat = request.POST['lat']
-        lng = request.POST['lng']
+        lat = round(float(request.POST['lat']), 5)
+        lng = round(float(request.POST['lng']), 5)
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
-        area = FIRE_AREA.predict_raw(df) * 10000
-        data_proba = FIRE_PROBA.predict_proba(df)
-        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=True, probability=data_proba)
-        return HttpResponse(json.dumps({'data': [lat, lng, area[0], data_proba[0]]}))
+        area = float(FIRE_AREA.predict_raw(df)[0] * 10000)
+        data_proba = round(float(FIRE_PROBA.predict_proba(df)[0][1]), 5)
+        print(lat, lng, area, data_proba)
+        Fire.objects.update_or_create(lat=lat, lng=lng, range=area, is_active=True, probability=data_proba)
+        return HttpResponse(json.dumps({'data': [lat, lng, area, data_proba]}))
     return HttpResponse(status=404)
 
 
 def get_fires(request):
     fires = Fire.objects.all()
-    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, fire.is_active, fire.probability] for fire in fires]}))
+    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, str(fire.is_active), fire.probability] for fire in fires]}))
 
 
 def populate_base_on_start():
@@ -64,7 +66,7 @@ def populate_base_on_start():
     dbObjects = []
 
     for entry in concatenatedData:
-        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False, probability=entry[3]))
+        dbObjects.append(Fire(lat=round(entry[0], 5), lng=round(entry[1], 5), range=entry[2], is_active=False, probability=entry[3]))
     try:
         Fire.objects.bulk_create(dbObjects)
     except IntegrityError as e:
