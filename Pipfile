@@ -15,6 +15,7 @@ xgboost = "*"
 pylint = "*"
 requests = "*"
 django = "*"
+plotly = "*"
 
 [dev-packages]
 
