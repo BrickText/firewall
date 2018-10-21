@@ -7,11 +7,7 @@ __all__ = [
     "FEATURE_NAMES",
 
     "fires",
-
-    "X",
-    "y_raw",
-    "y_log",
-    "y_sin",
+    "fires_classif",
 
     "custom_scorer",
 ]
@@ -24,13 +20,8 @@ FEATURE_NAMES = [
     "rain",
 ]
 
-fires = pd.read_csv("../forestfires.csv")
-
-X = fires[FEATURE_NAMES]
-y_raw = fires["area"]
-y_log = fires["log(area+1)"]
-y_sin = fires["sin(area)"]
-
+fires = pd.read_csv("../fires.csv")
+fires_classif = pd.read_csv("../fires_classif.csv")
 
 #############################
 ## Root Mean Squared Error ##
