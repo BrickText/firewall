@@ -111,6 +111,3 @@ venv.bak/
 
 # Custom
 bin/
-
-# Ignore Big Data
-**/*/worldwide.zip
