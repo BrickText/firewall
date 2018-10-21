@@ -6,7 +6,7 @@ var marker;
 function setMapOnLocation(location) {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: location.latitude, lng: location.longitude },
-        zoom: 20,
+        zoom: 7,
         mapTypeId: 'satellite' 
     });
 
@@ -18,7 +18,7 @@ function setMapOnLocation(location) {
             data = JSON.parse(data)["data"];
             data.forEach(el => {
             createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
-                         parseFloat(el[2]));
+                         parseFloat(el[2]), parseFloat(el[3]), parseFloat(el[4]));
             });
         }
       });
@@ -45,8 +45,9 @@ function initMap() {
 }
 
 
-function confirmFireModal(position) {
+function confirmFireModal(position, probability, area) {
     $("#position").val(position.lat() + "," + position.lng())
+    $("#probability").html("Probability: " + parseInt(probability * 100) + "% Area: " + parseInt(area) + " meters square.")
     $("#confirmFireForm").modal();
 }
 
@@ -55,7 +56,7 @@ function confirmFireModal(position) {
  * center -> long and lat
  * raius -> IN METERS
  */
-function createCircle(map, center, radius) {
+function createCircle(map, center, radius, active, probability) {
     var circle  = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
@@ -66,7 +67,10 @@ function createCircle(map, center, radius) {
         center: center,
         radius: radius
     });
-    circle.addListener('click', function() {confirmFireModal(circle.center)});
+    if(active) {
+        addActiveFireAnimation(center)
+    }
+    circle.addListener('click', function() {confirmFireModal(circle.center, probability, radius)});
     fireCircles.push(circle);
 }
 
@@ -113,8 +117,8 @@ function reportFire() {
     
     postData("/predict_fire", data, function(data) {
         positions = JSON.parse(data)["data"];
-        createCircle(map, {lat: parseFloat(positions[0]), lng: parseFloat(positions[1])},
-            parseFloat(positions[2]));
+        createCircle(map, {lat: parseFloat(positions[0]), lng: parseFloat(positions[1]),},
+            parseFloat(positions[2]), parseFloat(positions[3]));
     })
 
     $("#reportFire").modal('hide');

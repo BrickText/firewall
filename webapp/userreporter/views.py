@@ -40,14 +40,15 @@ def post_predict_new_fire(request):
         lng = request.POST['lng']
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
         area = FIRE_AREA.predict_raw(df) * 10000
-        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=True)
-        return HttpResponse(json.dumps({'data': [lat, lng, area[0]]}))
+        data_proba = FIRE_PROBA.predict_proba(df)
+        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=True, probability=data_proba)
+        return HttpResponse(json.dumps({'data': [lat, lng, area[0], data_proba[0]]}))
     return HttpResponse(status=404)
 
 
 def get_fires(request):
     fires = Fire.objects.all()
-    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, fire.is_active] for fire in fires]}))
+    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, fire.is_active, fire.probability] for fire in fires]}))
 
 
 def populate_base_on_start():
@@ -56,12 +57,14 @@ def populate_base_on_start():
         [get_features(centroid[0], centroid[1]).to_pandas()
          for centroid in centroids])
     area = FIRE_AREA.predict_raw(df) * 10000
+    data_proba = FIRE_PROBA.predict_proba(df)
 
     concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
+    concatenatedData = np.concatenate((concatenatedData, np.reshape(data_proba[:, 1], (-1, 1))), axis=1)
     dbObjects = []
 
     for entry in concatenatedData:
-        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False))
+        dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False, probability=entry[3]))
     try:
         Fire.objects.bulk_create(dbObjects)
     except IntegrityError as e:

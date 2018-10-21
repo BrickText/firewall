@@ -6,6 +6,7 @@ class Fire(models.Model):
     lng = models.FloatField()
     range = models.FloatField()
     is_active = models.BooleanField(default=False)
+    probability = models.FloatField(default=0.0)
 
     class Meta:
         unique_together = (('lat', 'lng'))
