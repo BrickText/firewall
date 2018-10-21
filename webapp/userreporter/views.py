@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.db.utils import IntegrityError
 
 import requests 
 import pandas as pd
@@ -21,11 +22,12 @@ def get_map(request):
 @csrf_exempt
 def post_confirm(request):
     if request.method == "POST":
-        confermed = request.POST['confermed']
+        confermed = True if request.POST['confermed'] == 'true' else False
         lat = request.POST['lat']
         lng = request.POST['lng']
         get_features(lat, lng)
-        Fire.objects.update_or_create(lat=float(lat), lng=float(lng), range=area, is_active=confermed)
+        print(Fire.objects.all())
+        Fire.objects.filter(lat=float(lat), lng=float(lng)).update(is_active=confermed)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=404)
@@ -60,7 +62,10 @@ def populate_base_on_start():
 
     for entry in concatenatedData:
         dbObjects.append(Fire(lat=entry[0], lng=entry[1], range=entry[2], is_active=False))
-    Fire.objects.bulk_create(dbObjects)
+    try:
+        Fire.objects.bulk_create(dbObjects)
+    except IntegrityError as e:
+        pass
 
 
 def get_features(lat, lng):
