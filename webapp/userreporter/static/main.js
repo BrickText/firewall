@@ -17,10 +17,10 @@ function setMapOnLocation(location) {
         success: function(data) {
             data = JSON.parse(data)["data"];
             data.forEach(el => {
-                if(parseFloat(el[4]) >= 0.3) {
+                // if(parseFloat(el[4]) >= 0.3) {
                     createCircle(map, {lat: parseFloat(el[0]), lng: parseFloat(el[1])},
                          parseFloat(el[2]), el[3], parseFloat(el[4]));
-                }
+                // }
             });
         }
       });
@@ -59,11 +59,15 @@ function confirmFireModal(position, probability, area) {
  * raius -> IN METERS
  */
 function createCircle(map, center, radius, active, probability) {
+    color = "#FF0000"
+    if(probability <= 0.3) {
+        color="#707070"
+    }
     var circle  = new google.maps.Circle({
-        strokeColor: '#FF0000',
+        strokeColor: color,
         strokeOpacity: 0.8,
         strokeWeight: 2,
-        fillColor: '#FF0000',
+        fillColor: color,
         fillOpacity: 0.35,
         map: map,
         center: center,
