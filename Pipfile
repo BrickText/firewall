@@ -5,19 +5,18 @@ name = "pypi"
 
 [packages]
 numpy = "*"
-scipy = "*"
-matplotlib = "*"
 pandas = "*"
 seaborn = "*"
-jupyter = "*"
+plotly = "*"
+tensorflow = "*"
 scikit-learn = "*"
 xgboost = "*"
-pylint = "*"
 requests = "*"
 django = "*"
-plotly = "*"
 
 [dev-packages]
+pylint = "*"
+jupyter = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
