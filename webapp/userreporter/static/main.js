@@ -40,8 +40,8 @@ function initMap() {
       }
       
       function error(err) {
-        allert('There was an error while tyring to locate you. Check if you browser can give your location.');
-        setMapOnLocation({'longtitude': 0, 'latitude': 0});
+        alert('There was an error while tyring to locate you. Check if you browser can give your location.');
+        setMapOnLocation({'longtitude': 0.0, 'latitude': 0.0});
       }
       navigator.geolocation.getCurrentPosition(success, error, options);
 }
@@ -73,7 +73,7 @@ function createCircle(map, center, radius, active, probability) {
         center: center,
         radius: radius
     });
-    console.log(active == "True")
+    // console.log(`Is Active: ${active}`);
     if(active == "True") {
         addActiveFireAnimation({latitude: center.lat, longitude: center.lng})
     }
@@ -124,7 +124,7 @@ function reportFire() {
     
     postData("/predict_fire", data, function(data) {
         positions = JSON.parse(data)["data"];
-        console.log(positions)
+        // console.log(positions)
         createCircle(map, {lat: parseFloat(positions[0]), lng: parseFloat(positions[1]),},
             parseFloat(positions[2]), "True",parseFloat(positions[3]));
     })
@@ -166,7 +166,7 @@ function removeActiveMarker(position) {
 }
 
 function addActiveFireAnimation(position) {
-    console.log(position)
+    // console.log(position)
     var infowindow = new google.maps.InfoWindow({
         content: "<h3>Active fire reported by user!</h3>"
       });
