@@ -346,11 +346,11 @@
         },
         "pydojoml": {
             "hashes": [
-                "sha256:3a1e4ae6753adcf2bee45bebcbd10bc114454a08ceebecbd95ff03ce71e42e7d",
-                "sha256:b63fbd45de3eff0d532dc39edc7aa31988844cb123f2ae7fc6303f3494eac38b"
+                "sha256:3f1fe4868511d9de9a2adeec7cf15eff6d5f488b025ea7be0982d7b42c27b737",
+                "sha256:e7f4962dd0247ccba478e07cd5e3db5cd1eaf48a4aa66f52b772a6a7076eecc1"
             ],
             "index": "pypi",
-            "version": "==0.4.1"
+            "version": "==0.4.2"
         },
         "pyparsing": {
             "hashes": [
