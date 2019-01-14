@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 
+from dojo.split import train_test_split
+from dojo.dimred import PrincipalComponentAnalysis as PCA
+
 __all__ = [
     "plot_decisions",
 ]
