@@ -108,6 +108,3 @@ venv.bak/
 
 # VS Code
 .vscode
-
-# Custom
-bin/
