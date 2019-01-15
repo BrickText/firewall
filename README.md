@@ -39,10 +39,6 @@ We are using **Python** as main programming languages, so we will have to set up
 * [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 * [XGBoost](https://xgboost.readthedocs.io/en/latest/) - Gradient Boosting framework
 
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
 ## Authors
 
 * **Victor Velev** - *Initial work* - [VIVelev](https://github.com/VIVelev)
