@@ -35,7 +35,9 @@ We are using **Python** as main programming languages, so we will have to set up
 
 ## Built With
 
-Coming soon...
+* [Django](https://www.djangoproject.com/) - The web framework
+* [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
+* [XGBoost](https://xgboost.readthedocs.io/en/latest/) - Gradient Boosting framework
 
 ## Contributing
 
