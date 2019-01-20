@@ -12,6 +12,7 @@ plotly = "*"
 tensorflow = "*"
 pydojoml = "*"
 xgboost = "*"
+scikit-learn = "*"
 requests = "*"
 django = "*"
 
