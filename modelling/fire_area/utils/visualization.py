@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
-from dojo.split import train_test_split
-from dojo.dimred import PrincipalComponentAnalysis as PCA
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 
 __all__ = [
     "plot_decisions",
