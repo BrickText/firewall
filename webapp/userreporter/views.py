@@ -99,4 +99,3 @@ class DataSetSample(dict):
     def __str__(self):
         return ("Humidity: " + str(self.humidity) + " Temperature: " + str(self.temp) + " Wind speed: " +
             str(self.wind_speed) + " Rain per m^2:" + str(self.rain_per_mm))
-

@@ -18,20 +18,35 @@ We are using **Python** as main programming languages, so we will have to set up
 2) Now, because we are using virtual environment to manage our dependencies, you will need to download **Pipenv**.
 <br> Check out [here](https://pipenv.readthedocs.io/en/latest/install/#installing-pipenv) to understand how to do so.
 
-3) Once you have installed **Pipenv** you are ready to install the requirements specified in the `Pipfile`.
-<br>Navigate to the root directory of the project and run the following:
+3) Clone/download this repository on you local machine.
+<br> Run this in your terminal to clone the repo.
+    ```bash
+    git clone https://github.com/BrickText/firewall
+    ```
+
+4) Once you have installed **Pipenv** you are ready to install the requirements specified in the `Pipfile`.
+<br>Navigate to the root directory (```cd ./firewall```) of the project and run the following:
     ```bash
     pipenv install
     ```
 
-4) Good Job! Now you are all setup to run the app.
+5) Good Job! Now you are all setup to run the app.
 
 ### Running
 
-* Navigate to the `firewall/webbapp` and run the following:
+* Navigate to the `firewall/webbapp` directory and run the following:
     ```bash
-    pipenv run python manage.py
+    pipenv run python manage.py runserver
     ```
+    Wait till something like this is shown:
+    ```
+    System check identified no issues (0 silenced).
+    January 23, 2019 - 22:21:52
+    Django version 2.1.5, using settings 'webapp.settings'
+    Starting development server at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+    ```
+    Now the server is run. You can go to [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## Built With
 
