@@ -2,7 +2,6 @@
 import os
 import sys
 
-from userreporter.stacked_model import StackedModel
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webapp.settings')

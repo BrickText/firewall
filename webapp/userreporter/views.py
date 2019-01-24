@@ -39,9 +39,17 @@ def post_predict_new_fire(request):
     if request.method == "POST":
         lat = round(float(request.POST['lat']), 5)
         lng = round(float(request.POST['lng']), 5)
+
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
-        area = float(FIRE_AREA.predict_raw(df)[0] * 10000)
         data_proba = round(float(FIRE_PROBA.predict_proba(df)[0][1]), 5)
+
+        try:
+            area = float(FIRE_AREA.predict(df)[0] * 10000)
+        except Exception:
+            # Parse to XGBoost compatible format
+            df.columns = ['f0', 'f1', 'f2', 'f3']
+            area = float(FIRE_AREA.predict(df)[0] * 10000)
+
         print(lat, lng, area, data_proba)
         Fire.objects.update_or_create(lat=lat, lng=lng, range=area, is_active=True, probability=data_proba)
         return HttpResponse(json.dumps({'data': [lat, lng, area, data_proba]}))
@@ -58,10 +66,16 @@ def populate_base_on_start():
     df = pd.DataFrame(
         [get_features(centroid[0], centroid[1]).to_pandas()
          for centroid in centroids])
-    area = FIRE_AREA.predict_raw(df) * 10000
     data_proba = FIRE_PROBA.predict_proba(df)
 
-    concatenatedData = np.concatenate((centroids, np.reshape(area.T, (-1, 1))), axis=1)
+    try:
+        areas = FIRE_AREA.predict(df) * 10000
+    except Exception:
+        # Parse to XGBoost compatible format
+        df.columns = ['f0', 'f1', 'f2', 'f3']
+        areas = FIRE_AREA.predict(df) * 10000
+
+    concatenatedData = np.concatenate((centroids, np.reshape(areas.T, (-1, 1))), axis=1)
     concatenatedData = np.concatenate((concatenatedData, np.reshape(data_proba[:, 1], (-1, 1))), axis=1)
     dbObjects = []
 
@@ -87,7 +101,7 @@ def get_features(lat, lng):
 class DataSetSample(dict):
 
     def __init__(self, humidity, temp, wind_speed, rain_per_mm):
-        super(dict, self).__init__()
+        super().__init__()
         self['temp'] = float(temp)
         self['RH'] = float(humidity)
         self['wind'] = float(wind_speed)
@@ -97,5 +111,5 @@ class DataSetSample(dict):
         return pd.Series(self)
 
     def __str__(self):
-        return ("Humidity: " + str(self.humidity) + " Temperature: " + str(self.temp) + " Wind speed: " +
-            str(self.wind_speed) + " Rain per m^2:" + str(self.rain_per_mm))
+        return ("Humidity: " + str(self['RH']) + " Temperature: " + str(self['temp']) + " Wind speed: " +
+            str(self['wind']) + " Rain per m^2:" + str(self['rain']))

@@ -4,12 +4,14 @@ var activeMarkers = new Array();
 var marker;
 
 function setMapOnLocation(location) {
+    console.log("Set map on location")
+
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: location.latitude, lng: location.longitude },
         zoom: 7,
         mapTypeId: 'satellite' 
     });
-    console.log("Set map on location")
+    
     $.ajax({
         type: "GET",
         url: '/get_fire',
@@ -34,7 +36,6 @@ function initMap() {
         maximumAge: 0
       };
       
-      var longt = 0, lat = 0;
       function success(pos) {
         setMapOnLocation(pos.coords);
       }
