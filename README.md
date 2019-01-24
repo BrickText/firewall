@@ -38,7 +38,8 @@ We are using **Python** as main programming languages, so we will have to set up
     ```bash
     pipenv run python manage.py runserver
     ```
-    Wait till something like this is shown:
+
+    Wait till something like this shows up:
     ```
     System check identified no issues (0 silenced).
     January 23, 2019 - 22:21:52
