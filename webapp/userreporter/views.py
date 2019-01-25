@@ -26,10 +26,8 @@ def post_confirm(request):
         confirmed = True if request.POST['confirmed'] == 'true' else False
         lat = round(float(request.POST['lat']), 5)
         lng = round(float(request.POST['lng']), 5)
-        print([(fire.lat, fire.lng)for fire in Fire.objects.all()])
-        print(lat, lng)
-        print(Fire.objects.filter(lat=lat, lng=lng))
         Fire.objects.filter(lat=lat, lng=lng).update(is_active=confirmed)
+
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=404)
@@ -44,17 +42,11 @@ def post_predict_new_fire(request):
 
         df = pd.DataFrame([get_features(lat, lng).to_pandas()])
         data_proba = round(float(FIRE_PROBA.predict_proba(df)[0][1]), 5)
-
-        # try:
         area = float(FIRE_AREA.predict(df)[0] * 10000)
-        # except Exception:
-        #     # Parse to XGBoost compatible format
-        #     df.columns = ['f0', 'f1', 'f2', 'f3']
-        #     area = float(FIRE_AREA.predict(df)[0] * 10000)
 
-        print(lat, lng, area, data_proba)
         Fire.objects.update_or_create(lat=lat, lng=lng, range=area, is_active=True, probability=data_proba)
         return HttpResponse(json.dumps({'data': [lat, lng, area, data_proba]}))
+
     return HttpResponse(status=404)
 
 # ====================================================================================================
@@ -72,19 +64,14 @@ def populate_base_on_start():
     df = pd.DataFrame(
         [get_features(centroid[0], centroid[1]).to_pandas()
          for centroid in centroids])
-    data_proba = FIRE_PROBA.predict_proba(df)
 
-    # try:
+    data_proba = FIRE_PROBA.predict_proba(df)
     areas = FIRE_AREA.predict(df) * 10000
-    # except Exception:
-    #     # Parse to XGBoost compatible format
-    #     df.columns = ['f0', 'f1', 'f2', 'f3']
-    #     areas = FIRE_AREA.predict(df) * 10000
 
     concatenatedData = np.concatenate((centroids, np.reshape(areas.T, (-1, 1))), axis=1)
     concatenatedData = np.concatenate((concatenatedData, np.reshape(data_proba[:, 1], (-1, 1))), axis=1)
-    dbObjects = []
 
+    dbObjects = []
     for entry in concatenatedData:
         dbObjects.append(
             Fire(lat=round(entry[0], 5), lng=round(entry[1], 5), range=entry[2], is_active=False, probability=entry[3])
@@ -100,11 +87,12 @@ def get_features(lat, lng):
     url = 'http://api.apixu.com/v1/current.json?key=ad23cdc4a1404d34984174745182010&q='\
         + str(lat) + ',' + str(lng)
     req = requests.get(url).json()
+
     if 'error' in req:
         return DataSetSample(0, 0, 0, 0)
+
     r = req['current']
-    dataSample = DataSetSample(r['temp_c'], r['humidity'], r['wind_kph'], r['precip_mm'])
-    return dataSample
+    return DataSetSample(r['temp_c'], r['humidity'], r['wind_kph'], r['precip_mm'])
 
 # ====================================================================================================
 
