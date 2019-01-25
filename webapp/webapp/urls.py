@@ -13,13 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls.static import static
-from django.conf import settings
 
-from userreporter.views import get_map, post_confirm, get_fires,\
-    post_predict_new_fire, populate_base_on_start
+from userreporter.views import (get_fires, get_map, populate_base_on_start,
+                                post_confirm, post_predict_new_fire)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +30,4 @@ urlpatterns = [
     path('predict_fire', post_predict_new_fire),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-
-populate_base_on_start()
+# populate_base_on_start()

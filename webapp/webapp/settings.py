@@ -34,14 +34,14 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'userreporter.apps.UserreporterConfig',
+
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sessions',
     'django.contrib.staticfiles',
-    # 'channels',
-    'userreporter',
 ]
 
 MIDDLEWARE = [
@@ -124,9 +124,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    "userreporter/static",
+    os.path.join(BASE_DIR, 'static'),
+    'userreporter/static',
 ]
 
 
-ASGI_APPLICATION = "webapp.routing.application"
+ASGI_APPLICATION = 'webapp.routing.application'
