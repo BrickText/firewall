@@ -30,4 +30,4 @@ urlpatterns = [
     path('predict_fire', post_predict_new_fire),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# populate_base_on_start()
+populate_base_on_start()
