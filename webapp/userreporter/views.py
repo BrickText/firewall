@@ -1,21 +1,24 @@
-from django.http import HttpResponse
-from django.views import View
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.db.utils import IntegrityError
-
-import requests 
-import pandas as pd
-import numpy as np
 import json
 
-from userreporter.models import Fire
-from userreporter.ml_models import FIRE_CLUSTERING, FIRE_AREA, FIRE_PROBA
+import numpy as np
+import pandas as pd
+import requests
+from django.db.utils import IntegrityError
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
+from userreporter.ml_models import FIRE_AREA, FIRE_CLUSTERING, FIRE_PROBA
+from userreporter.models import Fire
+
+
+# ====================================================================================================
 
 def get_map(request):
     return render(request, 'index.html', locals())
 
+# ====================================================================================================
 
 @csrf_exempt
 def post_confirm(request):
@@ -31,6 +34,7 @@ def post_confirm(request):
     else:
         return HttpResponse(status=404)
 
+# ====================================================================================================
 
 @csrf_exempt
 def post_predict_new_fire(request):
@@ -53,11 +57,15 @@ def post_predict_new_fire(request):
         return HttpResponse(json.dumps({'data': [lat, lng, area, data_proba]}))
     return HttpResponse(status=404)
 
+# ====================================================================================================
 
 def get_fires(request):
     fires = Fire.objects.all()
-    return HttpResponse(json.dumps({'data': [[fire.lat, fire.lng, fire.range, str(fire.is_active), fire.probability] for fire in fires]}))
+    return HttpResponse(json.dumps(
+        {'data': [[fire.lat, fire.lng, fire.range, str(fire.is_active), fire.probability] for fire in fires]}
+    ))
 
+# ====================================================================================================
 
 def populate_base_on_start():
     centroids = FIRE_CLUSTERING.cluster_centers_
@@ -78,12 +86,15 @@ def populate_base_on_start():
     dbObjects = []
 
     for entry in concatenatedData:
-        dbObjects.append(Fire(lat=round(entry[0], 5), lng=round(entry[1], 5), range=entry[2], is_active=False, probability=entry[3]))
+        dbObjects.append(
+            Fire(lat=round(entry[0], 5), lng=round(entry[1], 5), range=entry[2], is_active=False, probability=entry[3])
+        )
     try:
         Fire.objects.bulk_create(dbObjects)
     except IntegrityError:
         pass
 
+# ====================================================================================================
 
 def get_features(lat, lng):
     url = 'http://api.apixu.com/v1/current.json?key=ad23cdc4a1404d34984174745182010&q='\
@@ -95,9 +106,9 @@ def get_features(lat, lng):
     dataSample = DataSetSample(r['temp_c'], r['humidity'], r['wind_kph'], r['precip_mm'])
     return dataSample
 
+# ====================================================================================================
 
 class DataSetSample(dict):
-
     def __init__(self, temp, humidity, wind_speed, rain_per_mm):
         super().__init__()
         self['temp'] = float(temp)
@@ -111,3 +122,5 @@ class DataSetSample(dict):
     def __str__(self):
         return ('Temperature: ' + str(self['temp']) + 'Humidity: ' + str(self['RH']) + ' Wind speed: ' +
             str(self['wind']) + ' Rain per m^2:' + str(self['rain']))
+
+# ====================================================================================================
