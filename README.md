@@ -4,8 +4,9 @@
 
 FireWall is an expert system for predicting fires around the world based on weather cast data. The project is powered by machine learning algorithms and user friendly interface so that people can take advantage of all the data we have about this disasters.
 
-## Presentation
-[FireWall Presentation](https://docs.google.com/presentation/d/17Qqk8pE5YUIkOPb3wCbS2FpxyK5tPegBr9Fb8IbOQaY/edit?usp=sharing)
+## Presentation and related Documents
+[FireWall Presentation](./docs/FireWall-presentation.pdf)<br>
+[FirwWall Document](./docs/FireWall.pdf)
 
 ## How to install and run the app?
 
