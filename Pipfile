@@ -12,7 +12,7 @@ plotly = "*"
 scikit-learn = "*"
 xgboost = "*"
 requests = "*"
-django = ">=2.1.6"
+django = "*"
 
 [dev-packages]
 pylint = "*"
